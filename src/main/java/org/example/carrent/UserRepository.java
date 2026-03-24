@@ -24,11 +24,26 @@ public class UserRepository implements IUserRepository {
 
     @Override
     public List<User> getUsers() {
-        List<User> copies = new ArrayList<>();
-        for (User u : users) {
-            copies.add(new User(u));
+        return users.stream().map(User::new).toList();
+    }
+
+    @Override
+    public boolean addUser(User user) {
+        if (getUser(user.getLogin()) != null) return false;
+        users.add(new User(user));
+        save();
+        return true;
+    }
+
+    @Override
+    public boolean removeUser(String login) {
+        User user = getUser(login);
+        if (user != null && (user.getRentedVehicleId() == null || user.getRentedVehicleId().isEmpty())) {
+            users.removeIf(u -> u.getLogin().equals(login));
+            save();
+            return true;
         }
-        return copies;
+        return false;
     }
 
     @Override
@@ -43,27 +58,24 @@ public class UserRepository implements IUserRepository {
         return false;
     }
 
-    @Override
-    public void save() {
+    private void save() {
         try (PrintWriter pw = new PrintWriter(new FileWriter(fileName))) {
             for (User u : users) {
                 pw.println(u.getLogin() + ";" + u.getPassword() + ";" + u.getRole() + ";" +
                         (u.getRentedVehicleId() == null ? "" : u.getRentedVehicleId()));
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        } catch (IOException e) { e.printStackTrace(); }
     }
 
-    @Override
-    public void load() {
+    private void load() {
         users.clear();
         try (Scanner sc = new Scanner(new File(fileName))) {
             while (sc.hasNextLine()) {
-                String[] data = sc.nextLine().split(";", -1);
+                String line = sc.nextLine();
+                if (line.isEmpty()) continue;
+                String[] data = line.split(";", -1);
                 users.add(new User(data[0], data[1], Role.valueOf(data[2]), data[3]));
             }
-        } catch (FileNotFoundException e) {
-        }
+        } catch (FileNotFoundException ignored) {}
     }
 }
