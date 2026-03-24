@@ -1,5 +1,7 @@
-package carrent;
-
+import carrent.Authentication;
+import carrent.IUserRepository;
+import carrent.User;
+import carrent.UserRepository;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
