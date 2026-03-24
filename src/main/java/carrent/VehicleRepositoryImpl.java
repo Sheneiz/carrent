@@ -52,8 +52,7 @@ public class VehicleRepositoryImpl implements IVehicleRepository {
         return false;
     }
 
-    @Override
-    public void save() {
+    private void save() {
         try (PrintWriter out = new PrintWriter(new FileWriter(File))) {
             for (Vehicle v : vehicles) {
                 out.println(v.toCSV());
@@ -62,9 +61,8 @@ public class VehicleRepositoryImpl implements IVehicleRepository {
             System.err.println("Błąd zapisywania danych do pliku: "+e.getMessage());
         }
     }
-
-    @Override
-    public void load() {
+    
+    private void load() {
         vehicles.clear();
         File file = new File(File);
         if (!file.exists()) {
