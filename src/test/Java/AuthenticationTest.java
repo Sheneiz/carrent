@@ -1,4 +1,4 @@
-package org.example.carrent;
+package carrent;
 
 import org.junit.jupiter.api.Test;
 
