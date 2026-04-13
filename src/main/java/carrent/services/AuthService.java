@@ -24,7 +24,7 @@ public class AuthService {
         try {
             parsedRole = Role.valueOf(role.toUpperCase());
         } catch (IllegalArgumentException | NullPointerException e) {
-            return false;
+            return false; 
         }
 
         String hashed = BCrypt.hashpw(rawPassword, BCrypt.gensalt());
