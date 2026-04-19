@@ -31,12 +31,24 @@ public class RentalService {
         if (isBusy) return false;
 
         Rental rental = Rental.builder()
+                .id(UUID.randomUUID().toString())
                 .userId(userId)
                 .vehicleId(vehicleId)
                 .rentDateTime(LocalDateTime.now().toString())
                 .build();
         rentalRepo.save(rental);
         return true;
+    }
+
+    public List<Vehicle> getRentedVehicles(String userId) {
+        List<String> userRentedIds = rentalRepo.findAll().stream()
+                .filter(r -> r.isActive() && userId.equals(r.getUserId()))
+                .map(Rental::getVehicleId)
+                .collect(Collectors.toList());
+
+        return vehicleRepo.findAll().stream()
+                .filter(v -> userRentedIds.contains(v.getId()))
+                .collect(Collectors.toList());
     }
 
     public boolean returnVehicle(String vehicleId) {
@@ -46,4 +58,5 @@ public class RentalService {
             return true;
         }).orElse(false);
     }
+
 }

@@ -18,7 +18,6 @@ public class Main {
         VehicleRepository vehicleRepo;
         RentalRepository rentalRepo;
 
-
         switch(storageType) {
             case "json" -> {
                 userRepo = new UserJsonRepository();
@@ -27,8 +26,9 @@ public class Main {
             }
             default -> throw new IllegalArgumentException("Unknown storage type: " + storageType);
         }
-        AuthService authService = new AuthService(userRepo);
-        VehicleService vehicleService = new VehicleService(vehicleRepo, rentalRepo);
+
+        AuthService authService = new AuthService(userRepo, rentalRepo);
+        VehicleService vehicleService = new VehicleService(vehicleRepo, rentalRepo, "categories.json");
         RentalService rentalService = new RentalService(vehicleRepo,rentalRepo );
         App app = new App(authService, vehicleService, rentalService);
         app.run();

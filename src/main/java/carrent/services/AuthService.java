@@ -2,7 +2,9 @@ package carrent.services;
 
 import carrent.models.Role;
 import carrent.models.User;
+import carrent.models.Rental;
 import carrent.repositories.UserRepository;
+import carrent.repositories.RentalRepository;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.Optional;
@@ -10,9 +12,11 @@ import java.util.Optional;
 public class AuthService {
 
     private final UserRepository userRepo;
+    private final RentalRepository rentalRepo;
 
-    public AuthService(UserRepository userRepo) {
+    public AuthService(UserRepository userRepo, RentalRepository rentalRepo) {
         this.userRepo = userRepo;
+        this.rentalRepo = rentalRepo;
     }
 
     public boolean register(String login, String rawPassword, String role) {
@@ -43,7 +47,7 @@ public class AuthService {
         return userRepo.findByLogin(login)
                 .filter(user -> {
                     String hash = user.getPassword();
-                    if (hash == null || !hash.startsWith("$2a$")) {
+                    if (hash == null || hash.isEmpty()) {
                         return false;
                     }
                     try {
@@ -52,5 +56,16 @@ public class AuthService {
                         return false;
                     }
                 });
+    }
+
+    public void deleteUser(String userId) {
+        boolean hasActiveRentals = rentalRepo.findAll().stream()
+                .anyMatch(rental -> rental.getUserId().equals(userId) && rental.isActive());
+
+        if (hasActiveRentals) {
+            throw new IllegalStateException("Nie można usunąć użytkownika, ponieważ ma wypożyczony pojazd!");
+        }
+
+        userRepo.deleteById(userId);
     }
 }
