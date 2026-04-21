@@ -31,7 +31,6 @@ public class AuthService {
         } catch (IllegalArgumentException | NullPointerException e) {
             return false; 
         }
-
         String hashed = BCrypt.hashpw(rawPassword, BCrypt.gensalt());
 
         User user = User.builder()
@@ -39,7 +38,6 @@ public class AuthService {
                 .password(hashed)
                 .role(parsedRole)
                 .build();
-
         userRepo.save(user);
         return true;
     }
