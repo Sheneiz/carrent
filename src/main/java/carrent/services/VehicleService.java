@@ -9,6 +9,7 @@ import com.google.gson.reflect.TypeToken;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 public class VehicleService {
@@ -48,6 +49,9 @@ public class VehicleService {
             vehicle.setId(UUID.randomUUID().toString());
         }
         vehicleRepo.save(vehicle);
+    }
+    public Optional<Vehicle> getVehicleById(String id) {
+        return vehicleRepo.findById(id);
     }
     
     private void validate(Vehicle vehicle) {

@@ -39,6 +39,11 @@ public class RentalService {
         rentalRepo.save(rental);
         return true;
     }
+    public List<Rental> getAllActiveRentals() {
+        return rentalRepo.findAll().stream()
+                .filter(Rental::isActive)
+                .collect(Collectors.toList());
+    }
 
     public List<Vehicle> getRentedVehicles(String userId) {
         List<String> userRentedIds = rentalRepo.findAll().stream()

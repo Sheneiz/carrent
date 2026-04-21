@@ -7,6 +7,7 @@ import carrent.repositories.UserRepository;
 import carrent.repositories.RentalRepository;
 import org.mindrot.jbcrypt.BCrypt;
 
+import java.util.List;
 import java.util.Optional;
 
 public class AuthService {
@@ -56,6 +57,12 @@ public class AuthService {
                         return false;
                     }
                 });
+    }
+    public List<User> getAllUsers() {
+        return userRepo.findAll();
+    }
+    public Optional<User> getUserById(String id) {
+        return userRepo.findById(id);
     }
 
     public void deleteUser(String userId) {
