@@ -9,6 +9,7 @@ import carrent.repositories.impl.VehicleJsonRepository;
 import carrent.services.AuthService;
 import carrent.services.RentalService;
 import carrent.services.VehicleService;
+import carrent.services.VehicleValidator;
 
 public class Main {
     public static void main(String[] args) {
@@ -26,10 +27,14 @@ public class Main {
             }
             default -> throw new IllegalArgumentException("Unknown storage type: " + storageType);
         }
-
+        VehicleValidator vehicleValidator = new VehicleValidator();
         AuthService authService = new AuthService(userRepo, rentalRepo);
-        VehicleService vehicleService = new VehicleService(vehicleRepo, rentalRepo, "categories.json");
-        RentalService rentalService = new RentalService(vehicleRepo,rentalRepo );
+        VehicleService vehicleService = new VehicleService(
+                vehicleRepo,
+                rentalRepo,
+                "categories.json",
+                vehicleValidator
+        );        RentalService rentalService = new RentalService(vehicleRepo,rentalRepo );
         UI app = new UI(authService, vehicleService, rentalService);
         app.run();
     }
