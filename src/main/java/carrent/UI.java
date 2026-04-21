@@ -7,7 +7,7 @@ import carrent.services.VehicleService;
 
 import java.util.Scanner;
 
-public class App {
+public class UI {
     private final AuthService authService;
     private final VehicleService vehicleService;
     private final RentalService rentalService;
@@ -16,7 +16,7 @@ public class App {
     private User currentUser = null;
     private boolean running = true;
 
-    public App(AuthService authService, VehicleService vehicleService, RentalService rentalService) {
+    public UI(AuthService authService, VehicleService vehicleService, RentalService rentalService) {
         this.authService = authService;
         this.vehicleService = vehicleService;
         this.rentalService = rentalService;

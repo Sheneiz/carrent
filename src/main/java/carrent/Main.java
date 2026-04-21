@@ -30,7 +30,7 @@ public class Main {
         AuthService authService = new AuthService(userRepo, rentalRepo);
         VehicleService vehicleService = new VehicleService(vehicleRepo, rentalRepo, "categories.json");
         RentalService rentalService = new RentalService(vehicleRepo,rentalRepo );
-        App app = new App(authService, vehicleService, rentalService);
+        UI app = new UI(authService, vehicleService, rentalService);
         app.run();
     }
 }
