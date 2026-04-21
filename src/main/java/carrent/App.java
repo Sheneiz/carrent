@@ -72,38 +72,55 @@ public class App {
     }
 
     private void showMainMenu() {
-        System.out.println("\nZalogowano jako: " + currentUser.getLogin() + " [" + currentUser.getRole() + "]");
+        System.out.println("\n========================================");
+        System.out.println("Zalogowano jako: " + currentUser.getLogin() + " [" + currentUser.getRole() + "]");
         System.out.println("1. Lista dostępnych pojazdów");
         System.out.println("2. Wypożycz pojazd");
         System.out.println("3. Zwróć pojazd");
         System.out.println("4. Moje wypożyczone pojazdy");
 
-        if (currentUser.getRole().toString().equals("ADMIN")) {
-            System.out.println("8. Dodaj pojazd (ADMIN)");
-            System.out.println("9. Usuń pojazd (ADMIN)");
-            System.out.println("10. Usuń użytkownika (ADMIN)");
+        boolean isAdmin = currentUser.getRole().toString().equals("ADMIN");
+
+        if (isAdmin) {
+            System.out.println("\n--- PANEL ADMINISTRATORA ---");
+            System.out.println("8. Dodaj pojazd");
+            System.out.println("9. Usuń pojazd");
+            System.out.println("10. Usuń użytkownika");
+            System.out.println("11. Wyświetl wszystkie aktywne wypożyczenia");
         }
 
-        System.out.println("0. Wyloguj");
+        System.out.println("\n0. Wyloguj");
+        System.out.println("========================================");
 
         System.out.print("Wybierz: ");
-        String choice = scanner.nextLine();
+        String choice = scanner.nextLine().trim();
+
         switch (choice) {
             case "1" -> displayAvailableVehicles();
             case "2" -> handleRent();
             case "3" -> handleReturn();
             case "4" -> displayRentedVehicles();
             case "8" -> {
-                if (currentUser.getRole().toString().equals("ADMIN")) handleAdminAdd();
+                if (isAdmin) handleAdminAdd();
+                else System.out.println("Brak uprawnień.");
             }
             case "9" -> {
-                if (currentUser.getRole().toString().equals("ADMIN")) handleAdminDelete();
+                if (isAdmin) handleAdminDelete();
+                else System.out.println("Brak uprawnień.");
             }
             case "10" -> {
-                if (currentUser.getRole().toString().equals("ADMIN")) handleAdminDeleteUser();
+                if (isAdmin) handleAdminDeleteUser();
+                else System.out.println("Brak uprawnień.");
             }
-            case "0" -> currentUser = null;
-            default -> System.out.println("Niepoprawny wybór.");
+            case "11" -> {
+                if (isAdmin) handleShowAllRentedVehicles();
+                else System.out.println("Brak uprawnień.");
+            }
+            case "0" -> {
+                currentUser = null;
+                System.out.println("Wylogowano pomyślnie.");
+            }
+            default -> System.out.println("Niepoprawny wybór. Spróbuj ponownie.");
         }
     }
 
@@ -202,25 +219,73 @@ public class App {
     }
 
     private void handleAdminDeleteUser() {
-        System.out.print("Podaj ID użytkownika do usunięcia: ");
-        String userId = scanner.nextLine();
-        try {
-            if(currentUser.getId() != null && currentUser.getId().equals(userId)) {
-                System.out.println("Błąd: Nie możesz usunąć samego siebie.");
+            System.out.println("\n--- USUWANIE UŻYTKOWNIKA ---");
+            java.util.List<carrent.models.User> users = authService.getAllUsers();
+
+            if (users.isEmpty()) {
+                System.out.println("Brak użytkowników w systemie.");
                 return;
             }
-            authService.deleteUser(userId);
-            System.out.println("Użytkownik został pomyślnie usunięty.");
-        } catch (Exception e) {
-            System.out.println("Błąd: " + e.getMessage());
+
+            System.out.println("Dostępni użytkownicy:");
+            users.forEach(u -> System.out.printf("[%s] - %s (%s)%n", u.getId(), u.getLogin(), u.getRole()));
+
+            System.out.print("\nPodaj ID użytkownika do usunięcia (lub wpisz '0' aby anulować): ");
+            String userId = scanner.nextLine().trim();
+
+            if (userId.equals("0") || userId.isEmpty()) {
+                System.out.println("Anulowano usuwanie.");
+                return;
+            }
+
+            try {
+                authService.deleteUser(userId);
+                System.out.println("Sukces: Użytkownik o ID " + userId + " został usunięty.");
+            } catch (IllegalStateException e) {
+                System.out.println(e.getMessage());
+            } catch (Exception e) {
+                System.out.println("Błąd: Nie znaleziono użytkownika o podanym ID.");
+            }
         }
+    private void handleShowAllRentedVehicles() {
+        System.out.println("\n--- LISTA WSZYSTKICH AKTYWNYCH WYPOŻYCZEŃ ---");
+
+        java.util.List<carrent.models.Rental> activeRentals = rentalService.getAllActiveRentals();
+
+        if (activeRentals.isEmpty()) {
+            System.out.println("Obecnie żaden pojazd nie jest wypożyczony.");
+            return;
+        }
+
+        System.out.printf("%-15s | %-15s | %-15s | %-20s%n", "UŻYTKOWNIK", "POJAZD", "NR REJ.", "DATA WYPOŻ.");
+        System.out.println("---------------------------------------------------------------------------");
+
+        for (carrent.models.Rental rental : activeRentals) {
+            String userLogin = authService.getUserById(rental.getUserId())
+                    .map(carrent.models.User::getLogin)
+                    .orElse("Nieznany");
+
+            String vehicleInfo = vehicleService.getVehicleById(rental.getVehicleId())
+                    .map(v -> v.getBrand() + " " + v.getModel())
+                    .orElse("Nieznany pojazd");
+
+            String plate = vehicleService.getVehicleById(rental.getVehicleId())
+                    .map(carrent.models.Vehicle::getPlate)
+                    .orElse("???");
+
+            System.out.printf("%-15s | %-15s | %-15s | %-20s%n",
+                    userLogin, vehicleInfo, plate, rental.getRentDateTime());
+        }
+
+        System.out.println("\nNaciśnij Enter, aby wrócić...");
+        scanner.nextLine();
     }
 
     private void handleAdminAdd() {
         try {
             System.out.println("--- Dodawanie pojazdu ---");
             System.out.print("Kategoria (np. Car, Motorcycle, Bus): ");
-            String category = scanner.nextLine();
+            String category = scanner.nextLine().trim();
 
             java.util.Map<String, String> requiredAttributes = vehicleService.getCategoryAttributes(category);
 
