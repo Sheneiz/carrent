@@ -7,7 +7,7 @@ import java.util.Map;
 
 public class VehicleValidator {
 
-    public void validate(Vehicle vehicle, Map<String, String> requiredAttributes) {
+    public void validate(Vehicle vehicle, Map<String, Object> requiredAttributes) {
         if (vehicle.getBrand() == null || vehicle.getBrand().trim().length() < 2) {
             throw new IllegalArgumentException("Marka musi mieć co najmniej 2 znaki.");
         }
@@ -24,34 +24,37 @@ public class VehicleValidator {
         validateAttributes(requiredAttributes, vehicle.getAttributes());
     }
 
-    private void validateAttributes(Map<String, String> requiredAttributes, Map<String, Object> providedAttributes) {
+    private void validateAttributes(Map<String, Object> requiredAttributes, Map<String, Object> providedAttributes) {
         if (requiredAttributes == null) return;
 
-        for (Map.Entry<String, String> entry : requiredAttributes.entrySet()) {
+        for (Map.Entry<String, Object> entry : requiredAttributes.entrySet()) {
             String key = entry.getKey();
-            String type = entry.getValue().toUpperCase();
+            
+            String expectedType;
+            List<String> allowed = null;
+            
+            if (entry.getValue() instanceof Map) {
+                Map<String, Object> attrConfig = (Map<String, Object>) entry.getValue();
+                expectedType = ((String) attrConfig.get("type")).toUpperCase();
+                if (attrConfig.containsKey("allowed")) {
+                    allowed = (List<String>) attrConfig.get("allowed");
+                }
+            } else {
+                expectedType = ((String) entry.getValue()).toUpperCase();
+            }
+
             Object value = providedAttributes.get(key);
 
             if (value == null) throw new IllegalArgumentException("Brak atrybutu: " + key);
             String valStr = value.toString().trim();
 
-            if (!isTypeValid(value, type)) {
-                throw new IllegalArgumentException("Błędny typ dla " + key + ". Oczekiwano: " + type);
+            if (!isTypeValid(value, expectedType)) {
+                throw new IllegalArgumentException("Błędny typ dla " + key + ". Oczekiwano: " + expectedType);
             }
 
-
-            if (key.equalsIgnoreCase("fuelType")) {
-                List<String> allowed = List.of("Petrol", "Diesel", "Electric", "Hybrid","Benzyna","Ropa","Gasoline");
-
-                if (allowed.stream().noneMatch(f -> f.equalsIgnoreCase(valStr))) {
-                    throw new IllegalArgumentException("Niepoprawne paliwo. Dozwolone: " + allowed);
-                }
-            }
-
-            if (key.equalsIgnoreCase("licence")) {
-                List<String> allowed = List.of("A", "A1", "A2", "AM");
-                if (allowed.stream().noneMatch(l -> l.equalsIgnoreCase(valStr))) {
-                    throw new IllegalArgumentException("Niepoprawna licencja. Dozwolone: " + allowed);
+            if (allowed != null) {
+                if (allowed.stream().noneMatch(a -> a.equalsIgnoreCase(valStr))) {
+                    throw new IllegalArgumentException("Niepoprawna wartość dla " + key + ". Dozwolone: " + allowed);
                 }
             }
         }

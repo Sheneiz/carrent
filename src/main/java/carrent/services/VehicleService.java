@@ -25,7 +25,7 @@ public class VehicleService {
     }
 
     public void addVehicle(Vehicle vehicle) {
-        Map<String, String> required = getCategoryAttributes(vehicle.getCategory());
+        Map<String, Object> required = getCategoryAttributes(vehicle.getCategory());
         validator.validate(vehicle, required);
         vehicleRepo.save(vehicle);
     }
@@ -41,15 +41,15 @@ public class VehicleService {
                 .toList();
     }
 
-    public Map<String, String> getCategoryAttributes(String categoryName) {
+    public Map<String, Object> getCategoryAttributes(String categoryName) {
         List<Map<String, Object>> categories = categoryStorage.load();
         if (categories == null) return Map.of();
 
         return categories.stream()
                 .filter(c -> categoryName.equalsIgnoreCase((String) c.get("category")))
                 .findFirst()
-                .map(c -> (Map<String, String>) c.get("attributes"))
-                .orElseThrow(() -> new IllegalArgumentException("Nieprawidłowa kategoria: " + categoryName));
+                .map(c -> (Map<String, Object>) c.get("attributes"))
+                .orElseThrow(() -> new IllegalArgumentException("Nieprawidlowa kategoria: " + categoryName));
     }
 
     public Optional<Vehicle> getVehicleById(String id) {
