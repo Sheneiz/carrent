@@ -21,7 +21,7 @@ public class VehicleService {
         this.vehicleRepo = vehicleRepo;
         this.rentalRepo = rentalRepo;
         this.categoryStorage = new JsonFileStorage<>(categoriesFilePath, new TypeToken<List<Map<String, Object>>>() {}.getType());
-        this.validator = validator; // Teraz poprawnie przypisujemy wstrzyknięty obiekt
+        this.validator = validator;
     }
 
     public void addVehicle(Vehicle vehicle) {
