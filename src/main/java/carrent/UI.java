@@ -287,7 +287,7 @@ public class UI {
             System.out.print("Kategoria (np. Car, Motorcycle, Bus): ");
             String category = scanner.nextLine().trim();
 
-            java.util.Map<String, String> requiredAttributes = vehicleService.getCategoryAttributes(category);
+            java.util.Map<String, Object> requiredAttributes = vehicleService.getCategoryAttributes(category);
 
             System.out.print("Marka: ");
             String brand = scanner.nextLine();
@@ -312,10 +312,27 @@ public class UI {
 
             if (requiredAttributes != null && !requiredAttributes.isEmpty()) {
                 System.out.println("\n--- Wymagane atrybuty dla kategorii " + category + " ---");
-                for (java.util.Map.Entry<String, String> entry : requiredAttributes.entrySet()) {
+                for (java.util.Map.Entry<String, Object> entry : requiredAttributes.entrySet()) {
                     String attrName = entry.getKey();
-                    String attrType = entry.getValue();
-                    System.out.print("Podaj wartość dla '" + attrName + "' (wymagany typ danych: " + attrType.toUpperCase() + "): ");
+                    Object attrConfig = entry.getValue();
+                    String expectedType;
+                    java.util.List<String> allowed = null;
+
+                    if (attrConfig instanceof java.util.Map) {
+                        java.util.Map<String, Object> configMap = (java.util.Map<String, Object>) attrConfig;
+                        expectedType = (String) configMap.get("type");
+                        if (configMap.containsKey("allowed")) {
+                            allowed = (java.util.List<String>) configMap.get("allowed");
+                        }
+                    } else {
+                        expectedType = (String) attrConfig;
+                    }
+
+                    if (allowed != null && !allowed.isEmpty()) {
+                        System.out.print("Podaj wartość dla '" + attrName + "' (dostępne opcje: " + String.join(", ", allowed) + "): ");
+                    } else {
+                        System.out.print("Podaj wartość dla '" + attrName + "' (wymagany typ danych: " + expectedType.toUpperCase() + "): ");
+                    }
                     String value = scanner.nextLine();
                     vehicle.getAttributes().put(attrName, value);
                 }
@@ -330,3 +347,4 @@ public class UI {
         }
     }
 }
+
