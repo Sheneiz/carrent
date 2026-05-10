@@ -25,7 +25,7 @@ public final class HibernateConfig {
     private static SessionFactory buildSessionFactory() {
         String url = getValue("DB_URL", "db.url");
         if (url == null || url.isBlank()) {
-            throw new RuntimeException("DB_URL not set. Set environment variable DB_URL or VM option -Ddb.url=jdbc:...");
+            throw new IllegalStateException("DB_URL not set. Set environment variable DB_URL or VM option -Ddb.url=jdbc:...");
         }
 
         Map<String, Object> settings = new HashMap<>();
