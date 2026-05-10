@@ -32,7 +32,8 @@ public final class HibernateConfig {
         settings.put(AvailableSettings.DRIVER, "org.postgresql.Driver");
         settings.put(AvailableSettings.URL, url);
         settings.put(AvailableSettings.DIALECT, "org.hibernate.dialect.PostgreSQLDialect");
-        settings.put(AvailableSettings.HBM2DDL_AUTO, "update");
+        String hbm2ddlMode = getValue("DB_HBM2DDL_AUTO", "db.hbm2ddl.auto");
+        settings.put(AvailableSettings.HBM2DDL_AUTO, hbm2ddlMode != null ? hbm2ddlMode : "validate");
         settings.put(AvailableSettings.SHOW_SQL, false);
         settings.put(AvailableSettings.FORMAT_SQL, true);
 
