@@ -1,4 +1,4 @@
-package carrent.repositories.impl;
+package carrent.repositories.impl.jdbc;
 
 import carrent.db.DatabaseConnection;
 import carrent.models.Role;

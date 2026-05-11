@@ -1,51 +1,33 @@
-package carrent;
 
-import carrent.repositories.RentalRepository;
-import carrent.repositories.UserRepository;
-import carrent.repositories.VehicleRepository;
-import carrent.repositories.impl.RentalJsonRepository;
-import carrent.repositories.impl.UserJsonRepository;
-import carrent.repositories.impl.VehicleJsonRepository;
-import carrent.repositories.impl.RentalJdbcRepository;
-import carrent.repositories.impl.UserJdbcRepository;
-import carrent.repositories.impl.VehicleJdbcRepository;
-import carrent.services.AuthService;
-import carrent.services.RentalService;
-import carrent.services.VehicleService;
-import carrent.services.VehicleValidator;
+package carrent;
+import carrent.repositories.impl.hibernate.RentalHibernateRepository;
+import carrent.repositories.impl.hibernate.UserHibernateRepository;
+import carrent.repositories.impl.hibernate.VehicleHibernateRepository;
+import carrent.services.*;
+import carrent.services.hibernate.AuthHibernateService;
+import carrent.services.hibernate.RentalHibernateService;
+import carrent.services.hibernate.VehicleHibernateService;
+import carrent.services.inter.AuthServiceInterface;
+import carrent.services.inter.RentalServiceInterface;
+import carrent.services.inter.VehicleServiceInterface;
 
 public class Main {
     public static void main(String[] args) {
-        String storageType = "jdbc";
-
-        UserRepository userRepo;
-        VehicleRepository vehicleRepo;
-        RentalRepository rentalRepo;
-
-        switch(storageType) {
-            case "jdbc" -> {
-                System.out.println("Zainicjowano z pamięcią bazodanową (JDBC).");
-                userRepo = new UserJdbcRepository();
-                vehicleRepo = new VehicleJdbcRepository();
-                rentalRepo = new RentalJdbcRepository();
-            }
-            case "json" -> {
-                System.out.println("Zainicjowano z pamięcią lokalną plików (.json).");
-                userRepo = new UserJsonRepository();
-                vehicleRepo = new VehicleJsonRepository();
-                rentalRepo = new RentalJsonRepository();
-            }
-            default -> throw new IllegalArgumentException("Unknown storage type: " + storageType);
-        }
+        System.out.println("Zainicjowano z pamiecia bazodanowa (Hibernate).");
+        UserHibernateRepository userRepo = new UserHibernateRepository();
+        VehicleHibernateRepository vehicleRepo = new VehicleHibernateRepository();
+        RentalHibernateRepository rentalRepo = new RentalHibernateRepository();
         VehicleValidator vehicleValidator = new VehicleValidator();
-        AuthService authService = new AuthService(userRepo, rentalRepo);
-        VehicleService vehicleService = new VehicleService(
+        AuthServiceInterface authService = new AuthHibernateService(userRepo, rentalRepo);
+        VehicleServiceInterface vehicleService = new VehicleHibernateService(
                 vehicleRepo,
                 rentalRepo,
                 "categories.json",
                 vehicleValidator
-        );        RentalService rentalService = new RentalService(vehicleRepo,rentalRepo );
+        );
+        RentalServiceInterface rentalService = new RentalHibernateService(rentalRepo, vehicleRepo, userRepo);
         UI app = new UI(authService, vehicleService, rentalService);
         app.run();
     }
 }
+

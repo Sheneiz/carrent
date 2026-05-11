@@ -1,4 +1,4 @@
-package carrent.repositories.impl;
+package carrent.repositories.impl.jdbc;
 
 import carrent.db.DatabaseConnection;
 import carrent.models.Rental;
@@ -114,8 +114,8 @@ public class RentalJdbcRepository implements RentalRepository {
     private Rental mapToRental(ResultSet rs) throws SQLException {
         Rental r = new Rental();
         r.setId(rs.getString("id"));
-        r.setVehicleId(rs.getString("vehicle_id"));
-        r.setUserId(rs.getString("user_id"));
+        r.setVehicle(carrent.models.Vehicle.builder().id(rs.getString("vehicle_id")).build());
+        r.setUser(carrent.models.User.builder().id(rs.getString("user_id")).build());
         r.setRentDateTime(rs.getString("rent_date"));
         r.setReturnDateTime(rs.getString("return_date"));
         return r;
