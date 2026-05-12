@@ -23,7 +23,7 @@ public class VehicleJdbcRepository implements VehicleRepository {
     public List<Vehicle> findAll() {
         List<Vehicle> list = new ArrayList<>();
         String sql = "SELECT id, category, brand, model, year, plate, price, attributes FROM vehicle";
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql);
              ResultSet rs = pstmt.executeQuery()) {
 
@@ -39,7 +39,7 @@ public class VehicleJdbcRepository implements VehicleRepository {
     @Override
     public Optional<Vehicle> findById(String id) {
         String sql = "SELECT id, category, brand, model, year, plate, price, attributes FROM vehicle WHERE id = ?";
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             
             pstmt.setString(1, id);
@@ -70,7 +70,7 @@ public class VehicleJdbcRepository implements VehicleRepository {
                 attributes = EXCLUDED.attributes;
          """;
 
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             
             pstmt.setString(1, vehicle.getId());
@@ -94,7 +94,7 @@ public class VehicleJdbcRepository implements VehicleRepository {
     @Override
     public void deleteById(String id) {
         String sql = "DELETE FROM vehicle WHERE id = ?";
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             
             pstmt.setString(1, id);

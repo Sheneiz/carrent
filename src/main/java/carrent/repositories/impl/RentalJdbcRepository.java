@@ -16,7 +16,7 @@ public class RentalJdbcRepository implements RentalRepository {
     public List<Rental> findAll() {
         List<Rental> list = new ArrayList<>();
         String sql = "SELECT id, vehicle_id, user_id, rent_date, return_date FROM rental";
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql);
              ResultSet rs = pstmt.executeQuery()) {
 
@@ -32,7 +32,7 @@ public class RentalJdbcRepository implements RentalRepository {
     @Override
     public Optional<Rental> findById(String id) {
         String sql = "SELECT id, vehicle_id, user_id, rent_date, return_date FROM rental WHERE id = ?";
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             
             pstmt.setString(1, id);
@@ -50,7 +50,7 @@ public class RentalJdbcRepository implements RentalRepository {
     @Override
     public Optional<Rental> findByVehicleIdAndReturnDateIsNull(String vehicleId) {
         String sql = "SELECT id, vehicle_id, user_id, rent_date, return_date FROM rental WHERE vehicle_id = ? AND return_date IS NULL LIMIT 1";
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             
             pstmt.setString(1, vehicleId);
@@ -81,7 +81,7 @@ public class RentalJdbcRepository implements RentalRepository {
                 return_date = EXCLUDED.return_date;
         """;
 
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             
             pstmt.setString(1, rental.getId());
@@ -101,7 +101,7 @@ public class RentalJdbcRepository implements RentalRepository {
     @Override
     public void deleteById(String id) {
         String sql = "DELETE FROM rental WHERE id = ?";
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             
             pstmt.setString(1, id);

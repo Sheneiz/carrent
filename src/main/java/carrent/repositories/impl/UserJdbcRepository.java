@@ -17,7 +17,7 @@ public class UserJdbcRepository implements UserRepository {
     public List<User> findAll() {
         List<User> users = new ArrayList<>();
         String sql = "SELECT id, login, password_hash, role FROM users";
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql);
              ResultSet rs = pstmt.executeQuery()) {
 
@@ -33,7 +33,7 @@ public class UserJdbcRepository implements UserRepository {
     @Override
     public Optional<User> findById(String id) {
         String sql = "SELECT id, login, password_hash, role FROM users WHERE id = ?";
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             
             pstmt.setString(1, id);
@@ -51,7 +51,7 @@ public class UserJdbcRepository implements UserRepository {
     @Override
     public Optional<User> findByLogin(String login) {
         String sql = "SELECT id, login, password_hash, role FROM users WHERE login = ?";
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             
             pstmt.setString(1, login);
@@ -81,7 +81,7 @@ public class UserJdbcRepository implements UserRepository {
                 role = EXCLUDED.role;
         """;
 
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             
             pstmt.setString(1, user.getId());
@@ -99,7 +99,7 @@ public class UserJdbcRepository implements UserRepository {
     @Override
     public void deleteById(String id) {
         String sql = "DELETE FROM users WHERE id = ?";
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             
             pstmt.setString(1, id);
@@ -118,7 +118,7 @@ public class UserJdbcRepository implements UserRepository {
         
         // Find if user has rented vehicle
         String sql = "SELECT vehicle_id FROM rental WHERE user_id = ? AND return_date IS NULL LIMIT 1";
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, user.getId());
             try (ResultSet rs2 = pstmt.executeQuery()) {
