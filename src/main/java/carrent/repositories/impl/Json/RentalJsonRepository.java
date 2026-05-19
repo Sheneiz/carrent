@@ -1,4 +1,4 @@
-package carrent.repositories.impl;
+package carrent.repositories.impl.Json;
 
 import carrent.db.JsonFileStorage;
 import carrent.models.Rental;

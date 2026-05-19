@@ -1,22 +1,22 @@
 package carrent;
 
 import carrent.models.User;
-import carrent.services.AuthService;
-import carrent.services.RentalService;
-import carrent.services.VehicleService;
+import carrent.services.inter.AuthServiceInterface;
+import carrent.services.inter.RentalServiceInterface;
+import carrent.services.inter.VehicleServiceInterface;
 
 import java.util.Scanner;
 
 public class UI {
-    private final AuthService authService;
-    private final VehicleService vehicleService;
-    private final RentalService rentalService;
+    private final AuthServiceInterface authService;
+    private final VehicleServiceInterface vehicleService;
+    private final RentalServiceInterface rentalService;
     private final Scanner scanner = new Scanner(System.in);
 
     private User currentUser = null;
     private boolean running = true;
 
-    public UI(AuthService authService, VehicleService vehicleService, RentalService rentalService) {
+    public UI(AuthServiceInterface authService, VehicleServiceInterface vehicleService, RentalServiceInterface rentalService) {
         this.authService = authService;
         this.vehicleService = vehicleService;
         this.rentalService = rentalService;
