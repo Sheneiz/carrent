@@ -18,7 +18,7 @@ public class RentalService {
     public List<Vehicle> getAvailableVehicles() {
         List<String> rentedIds = rentalRepo.findAll().stream()
                 .filter(Rental::isActive)
-                .map(Rental::getVehicleId)
+                .map(r -> r.getVehicle().getId())
                 .collect(Collectors.toList());
 
         return vehicleRepo.findAll().stream()
@@ -27,18 +27,25 @@ public class RentalService {
     }
 
     public boolean rentVehicle(String userId, String vehicleId) {
-        boolean isBusy = rentalRepo.findByVehicleIdAndReturnDateIsNull(vehicleId).isPresent();
+      boolean isBusy = rentalRepo.findAll().stream()
+                .filter(Rental::isActive)
+                .anyMatch(r -> r.getVehicle().getId().equals(vehicleId));
         if (isBusy) return false;
+        Vehicle vehicle = vehicleRepo.findById(vehicleId)
+                .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono pojazdu"));
 
+        User user = User.builder().id(userId).build();
         Rental rental = Rental.builder()
                 .id(UUID.randomUUID().toString())
-                .userId(userId)
-                .vehicleId(vehicleId)
+                .user(user)
+                .vehicle(vehicle)
                 .rentDateTime(LocalDateTime.now().toString())
                 .build();
+
         rentalRepo.save(rental);
         return true;
     }
+
     public List<Rental> getAllActiveRentals() {
         return rentalRepo.findAll().stream()
                 .filter(Rental::isActive)
@@ -47,8 +54,8 @@ public class RentalService {
 
     public List<Vehicle> getRentedVehicles(String userId) {
         List<String> userRentedIds = rentalRepo.findAll().stream()
-                .filter(r -> r.isActive() && userId.equals(r.getUserId()))
-                .map(Rental::getVehicleId)
+                .filter(r -> r.isActive() && userId.equals(r.getUser().getId()))
+                .map(r -> r.getVehicle().getId())
                 .collect(Collectors.toList());
 
         return vehicleRepo.findAll().stream()
@@ -57,11 +64,15 @@ public class RentalService {
     }
 
     public boolean returnVehicle(String vehicleId) {
-        return rentalRepo.findByVehicleIdAndReturnDateIsNull(vehicleId).map(r -> {
+        Optional<Rental> activeRental = rentalRepo.findAll().stream()
+                .filter(Rental::isActive)
+                .filter(r -> r.getVehicle().getId().equals(vehicleId))
+                .findFirst();
+
+        return activeRental.map(r -> {
             r.setReturnDateTime(LocalDateTime.now().toString());
             rentalRepo.save(r);
             return true;
         }).orElse(false);
     }
-
 }
