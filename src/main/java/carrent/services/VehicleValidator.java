@@ -29,10 +29,10 @@ public class VehicleValidator {
 
         for (Map.Entry<String, Object> entry : requiredAttributes.entrySet()) {
             String key = entry.getKey();
-            
+
             String expectedType;
             List<String> allowed = null;
-            
+
             if (entry.getValue() instanceof Map) {
                 Map<String, Object> attrConfig = (Map<String, Object>) entry.getValue();
                 expectedType = ((String) attrConfig.get("type")).toUpperCase();

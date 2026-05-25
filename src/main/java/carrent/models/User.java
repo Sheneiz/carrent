@@ -18,10 +18,10 @@ public class User {
     
     @Column(nullable = false, unique = true)
     private String login;
-    
-    @Column(nullable = false)
+
+    @Column(name = "password_hash", nullable = false)
     private String password;
-    
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;

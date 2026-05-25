@@ -41,7 +41,7 @@ public class VehicleJdbcRepository implements VehicleRepository {
         String sql = "SELECT id, category, brand, model, year, plate, price, attributes FROM vehicle WHERE id = ?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            
+
             pstmt.setString(1, id);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
@@ -56,11 +56,11 @@ public class VehicleJdbcRepository implements VehicleRepository {
 
     @Override
     public Vehicle save(Vehicle vehicle) {
-         if (vehicle.getId() == null || vehicle.getId().isBlank()) {
-             vehicle.setId(UUID.randomUUID().toString());
-         }
+        if (vehicle.getId() == null || vehicle.getId().isBlank()) {
+            vehicle.setId(UUID.randomUUID().toString());
+        }
 
-         String sql = """
+        String sql = """
             INSERT INTO vehicle (id, category, brand, model, year, plate, price, attributes) 
             VALUES (?, ?, ?, ?, ?, ?, ?, ?::jsonb)
             ON CONFLICT (id) DO UPDATE 
@@ -72,7 +72,7 @@ public class VehicleJdbcRepository implements VehicleRepository {
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            
+
             pstmt.setString(1, vehicle.getId());
             pstmt.setString(2, vehicle.getCategory());
             pstmt.setString(3, vehicle.getBrand());
@@ -80,10 +80,10 @@ public class VehicleJdbcRepository implements VehicleRepository {
             pstmt.setInt(5, vehicle.getYear());
             pstmt.setString(6, vehicle.getPlate());
             pstmt.setDouble(7, vehicle.getPrice());
-            
+
             String attributesJson = vehicle.getAttributes() != null ? gson.toJson(vehicle.getAttributes()) : "{}";
             pstmt.setString(8, attributesJson);
-            
+
             pstmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -96,7 +96,7 @@ public class VehicleJdbcRepository implements VehicleRepository {
         String sql = "DELETE FROM vehicle WHERE id = ?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            
+
             pstmt.setString(1, id);
             pstmt.executeUpdate();
         } catch (SQLException e) {
@@ -113,7 +113,7 @@ public class VehicleJdbcRepository implements VehicleRepository {
         v.setYear(rs.getInt("year"));
         v.setPlate(rs.getString("plate"));
         v.setPrice(rs.getDouble("price"));
-        
+
         String attrJson = rs.getString("attributes");
         if (attrJson != null && !attrJson.isEmpty()) {
             Map<String, Object> attrs = gson.fromJson(attrJson, mapType);

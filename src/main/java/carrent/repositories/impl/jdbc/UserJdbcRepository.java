@@ -35,7 +35,7 @@ public class UserJdbcRepository implements UserRepository {
         String sql = "SELECT id, login, password_hash, role FROM users WHERE id = ?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            
+
             pstmt.setString(1, id);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
@@ -53,7 +53,7 @@ public class UserJdbcRepository implements UserRepository {
         String sql = "SELECT id, login, password_hash, role FROM users WHERE login = ?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            
+
             pstmt.setString(1, login);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
@@ -83,13 +83,13 @@ public class UserJdbcRepository implements UserRepository {
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            
+
             pstmt.setString(1, user.getId());
             pstmt.setString(2, user.getLogin());
             pstmt.setString(3, user.getPassword());
             pstmt.setString(4, user.getRole().name());
             pstmt.executeUpdate();
-            
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -101,7 +101,7 @@ public class UserJdbcRepository implements UserRepository {
         String sql = "DELETE FROM users WHERE id = ?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            
+
             pstmt.setString(1, id);
             pstmt.executeUpdate();
         } catch (SQLException e) {
@@ -115,7 +115,7 @@ public class UserJdbcRepository implements UserRepository {
         user.setLogin(rs.getString("login"));
         user.setPassword(rs.getString("password_hash"));
         user.setRole(Role.valueOf(rs.getString("role")));
-        
+
         // Find if user has rented vehicle
         String sql = "SELECT vehicle_id FROM rental WHERE user_id = ? AND return_date IS NULL LIMIT 1";
         try (Connection conn = DatabaseConnection.getConnection();

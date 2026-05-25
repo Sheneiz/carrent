@@ -30,4 +30,3 @@ public class VehicleHibernateRepository implements VehicleRepository {
         }
     }
 }
-

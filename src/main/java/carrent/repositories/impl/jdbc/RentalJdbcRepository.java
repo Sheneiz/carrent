@@ -34,7 +34,7 @@ public class RentalJdbcRepository implements RentalRepository {
         String sql = "SELECT id, vehicle_id, user_id, rent_date, return_date FROM rental WHERE id = ?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            
+
             pstmt.setString(1, id);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
@@ -52,7 +52,7 @@ public class RentalJdbcRepository implements RentalRepository {
         String sql = "SELECT id, vehicle_id, user_id, rent_date, return_date FROM rental WHERE vehicle_id = ? AND return_date IS NULL LIMIT 1";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            
+
             pstmt.setString(1, vehicleId);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
@@ -83,15 +83,15 @@ public class RentalJdbcRepository implements RentalRepository {
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            
+
             pstmt.setString(1, rental.getId());
             pstmt.setString(2, rental.getVehicleId());
             pstmt.setString(3, rental.getUserId());
             pstmt.setString(4, rental.getRentDateTime());
             pstmt.setString(5, rental.getReturnDateTime());
-            
+
             pstmt.executeUpdate();
-            
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -103,7 +103,7 @@ public class RentalJdbcRepository implements RentalRepository {
         String sql = "DELETE FROM rental WHERE id = ?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            
+
             pstmt.setString(1, id);
             pstmt.executeUpdate();
         } catch (SQLException e) {

@@ -12,4 +12,3 @@ public interface RentalRepository {
     void deleteById(String id);
     Optional<Rental> findByVehicleIdAndReturnDateIsNull(String vehicleId);
 }
-

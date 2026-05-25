@@ -10,4 +10,3 @@ public interface AuthServiceInterface {
     Optional<User> getUserById(String id);
     void deleteUser(String userId);
 }
-
