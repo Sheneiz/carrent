@@ -9,20 +9,27 @@ import carrent.repositories.impl.hibernate.VehicleHibernateRepository;
 import carrent.services.VehicleValidator;
 import carrent.services.inter.VehicleServiceInterface;
 import com.google.gson.reflect.TypeToken;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+@Service
+@Transactional
 public class VehicleHibernateService implements VehicleServiceInterface {
     private final VehicleHibernateRepository vehicleRepo;
     private final RentalHibernateRepository rentalRepo;
     private final JsonFileStorage<Map<String, Object>> categoryStorage;
     private final VehicleValidator validator;
 
-    public VehicleHibernateService(VehicleHibernateRepository vehicleRepo, RentalHibernateRepository rentalRepo, String categoriesFilePath, VehicleValidator validator) {
+    public VehicleHibernateService(
+            VehicleHibernateRepository vehicleRepo, 
+            RentalHibernateRepository rentalRepo, 
+            @Value("${app.categories.path:categories.json}") String categoriesFilePath, 
+            VehicleValidator validator) {
         this.vehicleRepo = vehicleRepo;
         this.rentalRepo = rentalRepo;
         this.categoryStorage = new JsonFileStorage<>(categoriesFilePath, new TypeToken<List<Map<String, Object>>>() {}.getType());
@@ -31,41 +38,27 @@ public class VehicleHibernateService implements VehicleServiceInterface {
 
     @Override
     public void addVehicle(Vehicle vehicle) {
-        try (Session session = HibernateConfig.getSessionFactory().openSession()) {
-            Transaction tx = session.beginTransaction();
-            vehicleRepo.setSession(session);
+        Map<String, Object> required = getCategoryAttributes(vehicle.getCategory());
+        validator.validate(vehicle, required);
 
-            Map<String, Object> required = getCategoryAttributes(vehicle.getCategory());
-            validator.validate(vehicle, required);
-
-            vehicleRepo.save(vehicle);
-            tx.commit();
-        }
+        vehicleRepo.save(vehicle);
     }
 
     @Override
     public List<Vehicle> getAvailableVehicles() {
-        try (Session session = HibernateConfig.getSessionFactory().openSession()) {
-            vehicleRepo.setSession(session);
-            rentalRepo.setSession(session);
+        List<String> activeRentalIds = rentalRepo.findAll().stream()
+                .filter(Rental::isActive)
+                .map(Rental::getVehicleId)
+                .toList();
 
-            List<String> activeRentalIds = rentalRepo.findAll().stream()
-                    .filter(Rental::isActive)
-                    .map(Rental::getVehicleId)
-                    .toList();
-
-            return vehicleRepo.findAll().stream()
-                    .filter(v -> !activeRentalIds.contains(v.getId()))
-                    .toList();
-        }
+        return vehicleRepo.findAll().stream()
+                .filter(v -> !activeRentalIds.contains(v.getId()))
+                .toList();
     }
 
     @Override
     public List<Vehicle> getAllVehicles() {
-        try (Session session = HibernateConfig.getSessionFactory().openSession()) {
-            vehicleRepo.setSession(session);
-            return vehicleRepo.findAll();
-        }
+        return vehicleRepo.findAll();
     }
 
     @Override
@@ -81,26 +74,16 @@ public class VehicleHibernateService implements VehicleServiceInterface {
 
     @Override
     public Optional<Vehicle> getVehicleById(String id) {
-        try (Session session = HibernateConfig.getSessionFactory().openSession()) {
-            vehicleRepo.setSession(session);
-            return vehicleRepo.findById(id);
-        }
+        return vehicleRepo.findById(id);
     }
 
     @Override
     public void deleteVehicle(String vehicleId) {
-        try (Session session = HibernateConfig.getSessionFactory().openSession()) {
-            Transaction tx = session.beginTransaction();
-            vehicleRepo.setSession(session);
-            rentalRepo.setSession(session);
-
-            boolean isRented = rentalRepo.findByVehicleIdAndReturnDateIsNull(vehicleId).isPresent();
-            if (isRented) {
-                throw new IllegalStateException("Nie można usunąć pojazdu, bo jest wypożyczony!");
-            }
-
-            vehicleRepo.deleteById(vehicleId);
-            tx.commit();
+        boolean isRented = rentalRepo.findByVehicleIdAndReturnDateIsNull(vehicleId).isPresent();
+        if (isRented) {
+            throw new IllegalStateException("Nie można usunąć pojazdu, bo jest wypożyczony!");
         }
+
+        vehicleRepo.deleteById(vehicleId);
     }
 }

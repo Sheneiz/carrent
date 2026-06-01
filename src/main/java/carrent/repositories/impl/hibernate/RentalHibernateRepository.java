@@ -8,42 +8,41 @@ import org.hibernate.query.Query;
 import java.util.List;
 import java.util.Optional;
 
+@org.springframework.stereotype.Repository
+@org.springframework.context.annotation.Profile("hibernate")
 public class RentalHibernateRepository implements RentalRepository {
 
-    private Session session;
-
-    public void setSession(Session session) {
-        this.session = session;
-    }
+    @jakarta.persistence.PersistenceContext
+    private jakarta.persistence.EntityManager entityManager;
 
     @Override
     public List<Rental> findAll() {
-        return session.createQuery("FROM Rental", Rental.class).list();
+        return entityManager.createQuery("FROM Rental", Rental.class).getResultList();
     }
 
     @Override
     public Optional<Rental> findById(String id) {
-        return Optional.ofNullable(session.get(Rental.class, id));
+        return Optional.ofNullable(entityManager.find(Rental.class, id));
     }
 
     @Override
     public Rental save(Rental rental) {
-        return session.merge(rental);
+        return entityManager.merge(rental);
     }
 
     @Override
     public void deleteById(String id) {
-        Rental rental = session.get(Rental.class, id);
+        Rental rental = entityManager.find(Rental.class, id);
         if (rental != null) {
-            session.remove(rental);
+            entityManager.remove(rental);
         }
     }
 
     @Override
     public Optional<Rental> findByVehicleIdAndReturnDateIsNull(String vehicleId) {
-        Query<Rental> query = session.createQuery(
+        jakarta.persistence.TypedQuery<Rental> query = entityManager.createQuery(
                 "FROM Rental r WHERE r.vehicle.id = :vehicleId AND r.returnDateTime IS NULL", Rental.class);
         query.setParameter("vehicleId", vehicleId);
-        return query.uniqueResultOptional();
+        return query.getResultStream().findFirst();
     }
 }
