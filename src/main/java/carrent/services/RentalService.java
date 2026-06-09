@@ -27,7 +27,7 @@ public class RentalService {
     }
 
     public boolean rentVehicle(String userId, String vehicleId) {
-        boolean isBusy = rentalRepo.findAll().stream()
+      boolean isBusy = rentalRepo.findAll().stream()
                 .filter(Rental::isActive)
                 .anyMatch(r -> r.getVehicle().getId().equals(vehicleId));
         if (isBusy) return false;
@@ -75,5 +75,4 @@ public class RentalService {
             return true;
         }).orElse(false);
     }
-
 }
