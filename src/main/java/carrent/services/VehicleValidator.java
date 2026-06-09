@@ -5,6 +5,7 @@ import java.time.Year;
 import java.util.List;
 import java.util.Map;
 
+@org.springframework.stereotype.Component
 public class VehicleValidator {
 
     public void validate(Vehicle vehicle, Map<String, Object> requiredAttributes) {

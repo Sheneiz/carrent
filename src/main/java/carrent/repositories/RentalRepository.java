@@ -13,3 +13,4 @@ public interface RentalRepository {
     Optional<Rental> findByVehicleIdAndReturnDateIsNull(String vehicleId);
 }
 
+

@@ -17,14 +17,16 @@ import java.util.Map;
 @ToString
 public class Vehicle {
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(nullable = false, unique = true)
     private String id;
+
     private String category;
     private String brand;
     private String model;
     private int year;
     private String plate;
-    
+
     @Column(columnDefinition = "NUMERIC")
     private double price;
 

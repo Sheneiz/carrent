@@ -13,7 +13,6 @@ import carrent.services.inter.VehicleServiceInterface;
 
 public class Main {
     public static void main(String[] args) {
-        System.out.println("Zainicjowano z pamiecia bazodanowa (Hibernate).");
         UserHibernateRepository userRepo = new UserHibernateRepository();
         VehicleHibernateRepository vehicleRepo = new VehicleHibernateRepository();
         RentalHibernateRepository rentalRepo = new RentalHibernateRepository();
