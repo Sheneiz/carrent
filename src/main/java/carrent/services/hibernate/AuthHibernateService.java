@@ -51,6 +51,7 @@ public class AuthHibernateService implements AuthServiceInterface {
                 .id(java.util.UUID.randomUUID().toString())
                 .login(login)
                 .password(hashedPassword)
+                .passwordHash(hashedPassword)
                 .role(parsedRole)
                 .build();
 
