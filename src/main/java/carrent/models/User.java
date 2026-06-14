@@ -22,9 +22,6 @@ public class User {
     @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "password_hash", nullable = false)
-    private String passwordHash;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
@@ -37,9 +34,15 @@ public class User {
                 .id(id)
                 .login(login)
                 .password(password)
-                .passwordHash(passwordHash)
                 .role(role)
                 .rentedVehicleId(rentedVehicleId)
                 .build();
+    }
+
+    @Override
+    public String toString() {
+        return "Użytkownik: " + login + " [" + role + "], ID: " + id +
+                ", Wypożyczony pojazd ID: " +
+                (rentedVehicleId == null || rentedVehicleId.isEmpty() ? "Brak" : rentedVehicleId);
     }
 }
