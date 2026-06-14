@@ -48,7 +48,7 @@ public class AuthHibernateService implements AuthServiceInterface {
         String hashedPassword = BCrypt.hashpw(rawPassword, BCrypt.gensalt());
 
         User user = User.builder()
-                .id(UUID.randomUUID())
+                .id(java.util.UUID.randomUUID().toString())
                 .login(login)
                 .password(hashedPassword)
                 .role(parsedRole)

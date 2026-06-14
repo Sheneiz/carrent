@@ -35,7 +35,7 @@ public class AuthService {
         String hashed = BCrypt.hashpw(rawPassword, BCrypt.gensalt());
 
         User user = User.builder()
-                .id(UUID.randomUUID())
+                .id(java.util.UUID.randomUUID().toString())
                 .login(login)
                 .password(hashed)
                 .role(parsedRole)

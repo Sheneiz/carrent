@@ -59,7 +59,7 @@ public class AuthController {
         if (userRepository.findByLogin(newUser.getLogin()).isPresent()) {
             return ResponseEntity.badRequest().body(Map.of("message", "Ten login jest już zajęty!"));
         }
-        newUser.setId(UUID.randomUUID());
+        newUser.setId(java.util.UUID.randomUUID().toString());
         String hashedPassword = passwordEncoder.encode(newUser.getPassword());
         newUser.setPassword(hashedPassword);
 

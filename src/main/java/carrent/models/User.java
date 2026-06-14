@@ -2,7 +2,6 @@ package carrent.models;
 
 import jakarta.persistence.*;
 import lombok.*;
-import java.util.UUID;
 
 @Entity
 @Table(name = "users")
@@ -14,8 +13,8 @@ import java.util.UUID;
 public class User {
 
     @Id
-    @Column(name = "id", columnDefinition = "UUID")
-    private UUID id;
+    @Column(name = "id")
+    private String id;
 
     @Column(nullable = false, unique = true)
     private String login;
@@ -30,19 +29,6 @@ public class User {
     @Transient
     private String rentedVehicleId;
 
-    // Metody pomocnicze zachowujemy, żeby reszta Twojego kodu się nie wywaliła:
-    public String getId() {
-        return id != null ? id.toString() : null;
-    }
-
-    public void setId(String id) {
-        this.id = id != null ? UUID.fromString(id) : null;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
     public User copy() {
         return User.builder()
                 .id(id)
@@ -55,7 +41,7 @@ public class User {
 
     @Override
     public String toString() {
-        return "Użytkownik: " + login + " [" + role + "], ID: " + getId() +
+        return "Użytkownik: " + login + " [" + role + "], ID: " + id +
                 ", Wypożyczony pojazd ID: " +
                 (rentedVehicleId == null || rentedVehicleId.isEmpty() ? "Brak" : rentedVehicleId);
     }
