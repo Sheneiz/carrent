@@ -1,6 +1,5 @@
 package carrent.services.hibernate;
 
-import carrent.db.HibernateConfig;
 import carrent.models.Role;
 import carrent.models.User;
 import carrent.repositories.impl.hibernate.RentalHibernateRepository;
@@ -8,6 +7,7 @@ import carrent.repositories.impl.hibernate.UserHibernateRepository;
 import carrent.services.inter.AuthServiceInterface;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Service;
+import org.springframework.context.annotation.Profile;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -15,6 +15,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@Profile("hibernate") // <- DODANE: Spring wie, że ma użyć tego serwisu dla profilu Hibernate
 @Transactional
 public class AuthHibernateService implements AuthServiceInterface {
     private final UserHibernateRepository userRepo;
@@ -44,12 +45,12 @@ public class AuthHibernateService implements AuthServiceInterface {
             return false;
         }
 
-        String hashed = BCrypt.hashpw(rawPassword, BCrypt.gensalt());
+        String hashedPassword = BCrypt.hashpw(rawPassword, BCrypt.gensalt());
 
         User user = User.builder()
-                .id(UUID.randomUUID().toString())
+                .id(UUID.randomUUID())
                 .login(login)
-                .password(hashed)
+                .password(hashedPassword)
                 .role(parsedRole)
                 .build();
 
