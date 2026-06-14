@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
-import java.util.UUID; // Dodany potrzebny import dla unikalnych identyfikatorów
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -59,7 +59,7 @@ public class AuthController {
         if (userRepository.findByLogin(newUser.getLogin()).isPresent()) {
             return ResponseEntity.badRequest().body(Map.of("message", "Ten login jest już zajęty!"));
         }
-        newUser.setId(UUID.randomUUID().toString());
+        newUser.setId(UUID.randomUUID());
         String hashedPassword = passwordEncoder.encode(newUser.getPassword());
         newUser.setPassword(hashedPassword);
 
