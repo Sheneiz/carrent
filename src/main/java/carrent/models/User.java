@@ -10,25 +10,25 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString
 public class User {
+
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(nullable = false, unique = true)
     private String id;
-    
+
     @Column(nullable = false, unique = true)
     private String login;
 
     @Column(name = "password_hash", nullable = false)
     private String password;
-    
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
-    
+
     @Transient
     private String rentedVehicleId;
-
 
     public User copy() {
         return User.builder()
@@ -39,7 +39,6 @@ public class User {
                 .rentedVehicleId(rentedVehicleId)
                 .build();
     }
-
     @Override
     public String toString() {
         return "Użytkownik: " + login + " [" + role + "], ID: " + id +
