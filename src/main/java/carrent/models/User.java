@@ -16,11 +16,13 @@ public class User {
     @Column(name = "id")
     private String id;
 
+    @Column(name = "password_hash", nullable = false)
+    private String passwordHash;
+
     @Column(name = "login", nullable = false, unique = true)
     private String login;
 
-    @Column(name = "password_hash", nullable = false)
-    private String passwordHash;
+
 
     @Column(name = "role", nullable = false)
     @Enumerated(EnumType.STRING)
@@ -36,7 +38,6 @@ public class User {
         return User.builder()
                 .id(id)
                 .login(login)
-                .password(password)
                 .passwordHash(passwordHash)
                 .role(role)
                 .rentedVehicleId(rentedVehicleId)
