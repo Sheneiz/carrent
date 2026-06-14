@@ -44,12 +44,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
-
         String token = authHeader.substring(7);
         try {
             String username = jwtUtil.extractUsername(token);
+
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+
                 if (jwtUtil.validateToken(token, userDetails)) {
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                             userDetails,
@@ -59,13 +60,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                     authToken.setDetails(
                             new WebAuthenticationDetailsSource().buildDetails(request)
                     );
+
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                 }
             }
         } catch (Exception e) {
-            // Logowanie błędu parsowania tokenu, ale nie przerywamy łańcucha
+            logger.error("Błąd podczas przetwarzania tokenu JWT: " + e.getMessage());
         }
-
         filterChain.doFilter(request, response);
     }
 }
