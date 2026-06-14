@@ -29,11 +29,11 @@ public class SecurityConfig {
     ) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.disable()) // Wyłączenie CORS na wypadek blokady w Postmanie
                 .formLogin(form -> form.disable())
                 .httpBasic(basic -> basic.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/login").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/users", "/api/users/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/rentals").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/vehicles").hasRole("ADMIN")
