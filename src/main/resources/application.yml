@@ -1,12 +1,11 @@
 spring:
   profiles:
-    active: ${APP_PROFILE:jpa}
+    active: ${APP_PROFILE:hibernate}
   main:
     banner-mode: "off"
 
 server:
   port: 8080
-
 
 jwt:
   secret: ${JWT_SECRET:5Sy1-R-Zj7ajgcabswkEttARiS8Q4Vs9IhYCVAt1bQ0}
@@ -62,7 +61,7 @@ spring:
 spring:
   config:
     activate:
-      on-profile: "jpa"
+      on-profile: "hibernate, jpa"
 
   datasource:
     url: ${DB:${DB_CONNECT_URL}}
