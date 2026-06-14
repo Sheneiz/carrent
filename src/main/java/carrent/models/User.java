@@ -16,18 +16,18 @@ public class User {
     @Column(name = "id")
     private String id;
 
-    @Column(nullable = false, unique = true)
+    @Column(name = "login", nullable = false, unique = true)
     private String login;
-
-    @Column(name = "password", nullable = true)
-    private String password;
 
     @Column(name = "password_hash", nullable = false)
     private String passwordHash;
 
+    @Column(name = "role", nullable = false)
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private Role role;
+
+    @Column(name = "password", nullable = true)
+    private String password;
 
     @Transient
     private String rentedVehicleId;
