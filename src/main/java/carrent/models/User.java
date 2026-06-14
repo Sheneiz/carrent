@@ -19,9 +19,9 @@ public class User {
     @Column(nullable = false, unique = true)
     private String login;
 
-    @Column(name = "password", nullable = false)
+    @Column(name = "password", nullable = true)
     private String password;
-    
+
     @Column(name = "password_hash", nullable = false)
     private String passwordHash;
 
@@ -37,6 +37,7 @@ public class User {
                 .id(id)
                 .login(login)
                 .password(password)
+                .passwordHash(passwordHash)
                 .role(role)
                 .rentedVehicleId(rentedVehicleId)
                 .build();
