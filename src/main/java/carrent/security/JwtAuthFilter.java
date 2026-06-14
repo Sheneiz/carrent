@@ -55,7 +55,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 }
             }
         } catch (Exception e) {
-            // Ignorujemy błędy parsowania tokenu
         }
 
         filterChain.doFilter(request, response);

@@ -1,6 +1,16 @@
 spring:
   profiles:
-    active: ${APP_PROFILE:json}
+    active: ${APP_PROFILE:jpa}
+  main:
+    banner-mode: "off"
+
+server:
+  port: 8080
+
+
+jwt:
+  secret: ${JWT_SECRET:5Sy1-R-Zj7ajgcabswkEttARiS8Q4Vs9IhYCVAt1bQ0}
+  expiration: ${JWT_EXPIRATION:3600000}
 
 ---
 # JSON Profile
@@ -8,6 +18,18 @@ spring:
   config:
     activate:
       on-profile: "json"
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+      - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.jpa.JpaRepositoriesAutoConfiguration
+
+carrent:
+  json:
+    users-file: ${CARENT_USERS_FILE:users.json}
+    vehicles-file: ${CARENT_VEHICLES_FILE:vehicles.json}
+    rentals-file: ${CARENT_RENTALS_FILE:rentals.json}
+    categories-file: ${CARENT_CATEGORIES_FILE:categories.json}
 
 data:
   categories:
@@ -25,22 +47,34 @@ spring:
   config:
     activate:
       on-profile: "jdbc"
-
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.jpa.JpaRepositoriesAutoConfiguration
   datasource:
-    url: ${DB_CONNECT_URL}
+    url: ${DB:${DB_CONNECT_URL}}
     username: ${DB_USERNAME:neondb_owner}
     password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
 
 ---
+# Hibernate / JPA Profile
 spring:
   config:
     activate:
-      on-profile: "hibernate"
+      on-profile: "jpa"
 
   datasource:
-    url: ${DB_CONNECT_URL}
+    url: ${DB:${DB_CONNECT_URL}}
     username: ${DB_USERNAME:neondb_owner}
     password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      connection-timeout: 10000
+      validation-timeout: 5000
+      initialization-fail-timeout: 10000
+      minimum-idle: 0
+      maximum-pool-size: 5
 
   jpa:
     show-sql: true
@@ -49,3 +83,4 @@ spring:
     properties:
       hibernate:
         format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
