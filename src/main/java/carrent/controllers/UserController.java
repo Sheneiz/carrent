@@ -1,7 +1,7 @@
 package carrent.controllers;
 
 import carrent.models.User;
-import carrent.repositories.impl.hibernate.UserHibernateRepository;
+import org.springframework.http.ResponseEntity; // Dodany import dla ResponseEntity
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,13 +17,14 @@ public class UserController {
     }
 
     @GetMapping
-    public List<User> list() {
-        return authService.getAllUsers();
+    public ResponseEntity<List<User>> list() {
+        return ResponseEntity.ok(authService.getAllUsers());
     }
 
     @GetMapping("/{id}")
-    public User get(@PathVariable String id) {
+    public ResponseEntity<User> get(@PathVariable String id) {
         return authService.getUserById(id)
+                .map(ResponseEntity::ok)
                 .orElseThrow(() -> new IllegalArgumentException("Nie odnaleziono użytkownika o podanym ID: " + id));
     }
 }

@@ -10,25 +10,24 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString
 public class User {
+
     @Id
-    @Column(nullable = false, unique = true)
+    @Column(name = "id")
     private String id;
-    
+
     @Column(nullable = false, unique = true)
     private String login;
 
-    @Column(name = "password_hash", nullable = false)
+    @Column(name = "password", nullable = false)
     private String password;
-    
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
-    
+
     @Transient
     private String rentedVehicleId;
-
 
     public User copy() {
         return User.builder()

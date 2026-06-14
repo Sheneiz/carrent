@@ -9,6 +9,7 @@ import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public class AuthService {
 
@@ -29,11 +30,12 @@ public class AuthService {
         try {
             parsedRole = Role.valueOf(role.toUpperCase());
         } catch (IllegalArgumentException | NullPointerException e) {
-            return false; 
+            return false;
         }
         String hashed = BCrypt.hashpw(rawPassword, BCrypt.gensalt());
 
         User user = User.builder()
+                .id(java.util.UUID.randomUUID().toString())
                 .login(login)
                 .password(hashed)
                 .role(parsedRole)
