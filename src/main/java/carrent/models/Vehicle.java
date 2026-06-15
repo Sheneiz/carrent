@@ -17,7 +17,6 @@ import java.util.Map;
 @ToString
 public class Vehicle {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(nullable = false, unique = true)
     private String id;
 
