@@ -2,12 +2,12 @@ package carrent.controllers;
 
 import carrent.models.VehicleCategoryConfig;
 import carrent.services.inter.VehicleServiceInterface;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 @RestController
@@ -15,9 +15,11 @@ import java.util.List;
 public class CategoryController {
 
     private final VehicleServiceInterface vehicleService;
+    private final ObjectMapper objectMapper;
 
-    public CategoryController(VehicleServiceInterface vehicleService) {
+    public CategoryController(VehicleServiceInterface vehicleService, ObjectMapper objectMapper) {
         this.vehicleService = vehicleService;
+        this.objectMapper = objectMapper;
     }
 
     @GetMapping("/{category}")
@@ -28,10 +30,10 @@ public class CategoryController {
 
     @GetMapping
     public List<VehicleCategoryConfig> list() {
-        try (FileReader reader = new FileReader("categories.json")) {
-            return new Gson().fromJson(reader, new TypeToken<List<VehicleCategoryConfig>>() {}.getType());
-        } catch (IOException e) {
-            throw new RuntimeException("Nie udało się odczytać pliku konfiguracyjnego categories.json", e);
+        try (InputStream inputStream = new ClassPathResource("categories.json").getInputStream()) {
+            return objectMapper.readValue(inputStream, new TypeReference<>() {});
+        } catch (Exception e) {
+            throw new RuntimeException("Nie udało się załadować kategorii z pliku", e);
         }
     }
 }
