@@ -44,7 +44,7 @@ public class RentalController {
         }
 
         return rentalService.getAllRentals().stream()
-                .filter(r -> r.getVehicleId().equals(vehicleId) && r.getUser().getId().equals(userId))
+                .filter(r -> r.getVehicleId().equals(vehicleId) && r.getUser().getId().equals(userId) && r.isActive())
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("Błąd podczas pobierania nowego wypożyczenia"));
     }
@@ -54,7 +54,7 @@ public class RentalController {
         validateUserAccess(userId, principal);
 
         Rental activeRental = rentalService.getAllRentals().stream()
-                .filter(r -> r.getUser() != null && userId.equals(r.getUser().getId()))
+                .filter(r -> r.getUser() != null && userId.equals(r.getUser().getId()) && r.isActive())
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Ten użytkownik nie ma aktualnie żadnego wypożyczonego pojazdu."));
 
