@@ -26,9 +26,10 @@ public class VehicleController {
     }
 
     @GetMapping("/{id}")
-    public Vehicle get(@PathVariable String id) {
+    public org.springframework.http.ResponseEntity<Vehicle> get(@PathVariable String id) {
         return vehicleService.getVehicleById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Nie odnaleziono pojazdu o podanym ID: " + id));
+                .map(org.springframework.http.ResponseEntity::ok)
+                .orElse(org.springframework.http.ResponseEntity.notFound().build()); // Zwróci 404 zamiast 400
     }
 
     @PostMapping

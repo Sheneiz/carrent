@@ -5,6 +5,7 @@ import carrent.dto.LoginResponse;
 import carrent.models.User;
 import carrent.repositories.UserRepository;
 import carrent.security.JwtUtil;
+import carrent.services.inter.AuthServiceInterface;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -26,19 +27,16 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final UserDetailsService userDetailsService;
     private final JwtUtil jwtUtil;
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
+    private final AuthServiceInterface authService;
 
     public AuthController(AuthenticationManager authenticationManager,
                           UserDetailsService userDetailsService,
                           JwtUtil jwtUtil,
-                          UserRepository userRepository,
-                          PasswordEncoder passwordEncoder) {
+                          AuthServiceInterface authService) {
         this.authenticationManager = authenticationManager;
         this.userDetailsService = userDetailsService;
         this.jwtUtil = jwtUtil;
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
+        this.authService = authService;
     }
 
     @PostMapping("/login")
@@ -56,14 +54,15 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody User newUser) {
-        if (userRepository.findByLogin(newUser.getLogin()).isPresent()) {
-            return ResponseEntity.badRequest().body(Map.of("message", "Ten login jest już zajęty!"));
-        }
-        newUser.setId(java.util.UUID.randomUUID().toString());
-        String hashedPassword = passwordEncoder.encode(newUser.getPassword());
-        newUser.setPassword(hashedPassword);
+        boolean success = authService.register(
+                newUser.getLogin(),
+                newUser.getPassword(),
+                newUser.getRole().name()
+        );
 
-        User savedUser = userRepository.save(newUser);
-        return ResponseEntity.ok(savedUser);
+        if (!success) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Rejestracja nie powiodła się."));
+        }
+        return ResponseEntity.ok(Map.of("message", "Użytkownik zarejestrowany pomyślnie."));
     }
 }

@@ -6,11 +6,12 @@ import carrent.repositories.VehicleRepository;
 import carrent.repositories.RentalRepository;
 import carrent.db.JsonFileStorage;
 import com.google.gson.reflect.TypeToken;
-
+import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+@Transactional
 public class VehicleService {
     private final VehicleRepository vehicleRepo;
     private final RentalRepository rentalRepo;
