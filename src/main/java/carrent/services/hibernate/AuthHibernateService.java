@@ -15,7 +15,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
-@Profile("hibernate") // <- DODANE: Spring wie, że ma użyć tego serwisu dla profilu Hibernate
+@Profile("hibernate")
 @Transactional
 public class AuthHibernateService implements AuthServiceInterface {
     private final UserHibernateRepository userRepo;
